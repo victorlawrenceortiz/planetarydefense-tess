@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Confirmed Orbits</title>
+  <style>
+    body{margin:0;overflow:hidden;background:#06070a;color:#eaeaea;font-family:system-ui}
+    #hud{position:fixed;top:10px;left:10px;background:rgba(0,0,0,.55);padding:10px;border-radius:8px;max-width:520px;z-index:10}
+    a{color:#9cf}
+  </style>
+</head>
+<body>
+  <div id="hud">
+    <div><b>Confirmed Orbits</b> — heliocentric, AU</div>
+    <div style="margin-top:6px"><a href="/">Home</a></div>
+    <div id="status" style="margin-top:8px;opacity:.9">loading…</div>
+    <div style="margin-top:6px;opacity:.75">Mouse: drag rotate • wheel zoom • right-drag pan</div>
+  </div>
+
+  <script type="module">
+    import * as THREE from '/static/vendor/three/three.module.js';
+    import { OrbitControls } from '/static/vendor/three/examples/jsm/controls/OrbitControls.js';
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x06070a, 10, 200);
+
+    const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.01, 2000);
+    camera.position.set(0, 18, 35);
+
+    const renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.domElement.style.position='fixed';
+    renderer.domElement.style.top='0';
+    renderer.domElement.style.left='0';
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.PointLight(0xffffff, 2.0));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+
+    scene.add(new THREE.AxesHelper(10));
+
+    // Sun (smaller)
+    const sun = new THREE.Mesh(
+      new THREE.SphereGeometry(0.18, 32, 32),
+      new THREE.MeshBasicMaterial({color:0xffdd66})
+    );
+    scene.add(sun);
+
+    function addLabel(text, color){
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.font = '14px system-ui';
+      const w = ctx.measureText(text).width + 20;
+      canvas.width = w; canvas.height = 26;
+      ctx.font = '14px system-ui';
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = color; ctx.fillText(text, 8, 18);
+      const tex = new THREE.CanvasTexture(canvas);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const spr = new THREE.Sprite(mat);
+      spr.scale.set(2.6, 0.8, 1);
+      return spr;
+    }
+
+    function addDot(pos, color, size){
+      const m = new THREE.Mesh(
+        new THREE.SphereGeometry(size, 16, 16),
+        new THREE.MeshBasicMaterial({color})
+      );
+      m.position.set(pos[0], pos[1], pos[2]);
+      scene.add(m);
+      return m;
+    }
+
+    function lineFromPoints(pts, color){
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts.flat()), 3));
+      const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity:0.85});
+      return new THREE.LineLoop(geo, mat);
+    }
+
+    const palette = [0xaaaaaa,0xffcc66,0x66aaff,0xff6666,0x99ff99,0xff99ff];
+
+    async function loadAll(){
+      const st = document.getElementById('status');
+      const planets = await (await fetch('/api/planets')).json();
+      const planetPos = await (await fetch('/api/planet_positions')).json();
+      const conf = await (await fetch('/api/confirmed')).json();
+
+      const planetColors = {mercury:0xb0b0b0, venus:0xffcc99, earth:0x66aaff, mars:0xff6666};
+      for (const [name, pts] of Object.entries(planets.orbits)){
+        scene.add(lineFromPoints(pts, planetColors[name]||0xffffff));
+      }
+
+      // Visible planet markers + labels
+      const planetDotSize = {mercury:0.06, venus:0.075, earth:0.08, mars:0.07};
+      for (const [name, p] of Object.entries(planetPos.positions)){
+        addDot(p, planetColors[name] || 0xffffff, planetDotSize[name] || 0.07);
+        const lab = addLabel(name, '#eaeaea');
+        lab.position.set(p[0], p[1]+0.25, p[2]);
+        scene.add(lab);
+      }
+
+      let i=0;
+      for (const obj of conf.objects){
+        const c = palette[i % palette.length];
+        scene.add(lineFromPoints(obj.orbit, c));
+        // asteroid as dot at first orbit point
+        if (obj.orbit && obj.orbit.length){
+          addDot(obj.orbit[0], c, 0.035);
+        }
+        i++;
+      }
+
+      st.textContent = `loaded: 4 inner planets + ${conf.objects.length} confirmed object orbits`;
+    }
+
+    loadAll().catch(e=>{
+      document.getElementById('status').textContent = 'error: ' + (e?.stack || e);
+      console.error(e);
+    });
+
+    addEventListener('resize', ()=>{
+      camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+
+    (function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene,camera);
+    })();
+  </script>
+</body>
+</html>

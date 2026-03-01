@@ -1,0 +1,13 @@
+{
+  "jpl": {
+    "dist_max_au": 0.01,
+    "days_ahead": 14,
+    "alert_max_ld": 4.0,
+    "alert_within_days": 14
+  },
+  "mpc": {
+    "max_lines_in_discord": 8,
+    "min_priority_to_alert": 60,
+    "max_items_in_discord": 5
+  }
+}

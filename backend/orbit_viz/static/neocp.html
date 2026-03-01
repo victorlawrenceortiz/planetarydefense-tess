@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>NEOCP (Provisional)</title>
+  <style>
+    body{margin:0;background:#06070a;color:#eaeaea;font-family:system-ui}
+    #wrap{padding:14px;max-width:1100px}
+    a{color:#9cf}
+    pre{white-space:pre-wrap;background:rgba(255,255,255,.06);padding:10px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <div><b>NEOCP (Provisional view)</b></div>
+    <div style="margin-top:6px"><a href="/">Home</a> • <a href="/confirmed">Confirmed</a></div>
+    <p>
+      This is a separate page for NEOCP candidates. These typically do not have reliable orbital elements yet.
+      Next improvement: a 3D provisional visualization with a range slider (not a true orbit).
+    </p>
+    <div id="status">loading…</div>
+    <pre id="out"></pre>
+  </div>
+  <script>
+    fetch('/api/neocp').then(r=>r.json()).then(d=>{
+      document.getElementById('status').textContent = `source: ${d.source} • lines: ${d.line_count}`;
+      document.getElementById('out').textContent = (d.lines||[]).slice(0,40).join('\n');
+    }).catch(e=>{document.getElementById('status').textContent='error: '+e;});
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[Unit]
+Description=PDF Orbit Visualization (3D)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/opt/pdf/venv/bin/uvicorn server:APP --host 0.0.0.0 --port 8790
+WorkingDirectory=/opt/pdf/viz/app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
