@@ -8,7 +8,7 @@ Homelab-based planetary defense tooling (PDF) built by TESS:
 
 ## Components
 
-### CT 121 (pdf-orbit-pipeline)
+### CT 121 (pd-tess-sol)
 - Runs ingestion/diff scripts + Postgres + API + viz.
 
 ### n8n (CT 117)
