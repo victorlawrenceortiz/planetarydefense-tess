@@ -1,0 +1,59 @@
+{
+  "name": "PDF: MPC NEOCP -> Discord",
+  "description": null,
+  "nodes": [
+    {
+      "id": "webhook1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "path": "pdf-mpc",
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "webhookId": "pdef-mpc"
+    },
+    {
+      "id": "discord1",
+      "name": "Post to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        540,
+        300
+      ],
+      "parameters": {
+        "url": "{{DISCORD_WEBHOOK_URL}}",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"content\": (function(){\n    const b = $json.body ?? $json;\n    const items = (b.items || []).slice(0,5);\n    const lines = items.map(i => {\n      const sc = (i.score ?? '');\n      const v = (i.v !== null && i.v !== undefined) ? ('V ' + Number(i.v).toFixed(1)) : '';\n      const arc = (i.arc !== null && i.arc !== undefined) ? ('arc ' + Number(i.arc).toFixed(2) + 'd') : '';\n      const nobs = (i.nobs !== null && i.nobs !== undefined) ? ('obs ' + i.nobs) : '';\n      return `\u2022 ${i.desig} (prio ${i.priority}, score ${sc}) \u2014 ${[v,nobs,arc].filter(Boolean).join(', ')}`;\n    }).join('\\n');\n    const hdr = `PDF MPC NEOCP TRIAGE: ${b.new_count ?? items.length} new object(s)`;\n    const src = b.source ? (`Source: ${b.source}`) : '';\n    return [hdr, lines, src].filter(Boolean).join('\\n');\n  })()\n} }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Post to Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null
+}

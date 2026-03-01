@@ -1,0 +1,54 @@
+{
+  "name": "PDF: Heartbeat Receiver",
+  "description": null,
+  "nodes": [
+    {
+      "id": "wh1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "path": "pdf-heartbeat",
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      }
+    },
+    {
+      "id": "code1",
+      "name": "Store Heartbeat",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Store last heartbeat timestamp in workflow static data\nconst s = this.getWorkflowStaticData('global');\ns.lastHeartbeat = new Date().toISOString();\ns.lastPayload = $json.body ?? $json;\nreturn [{ json: { ok: true, storedAt: s.lastHeartbeat } }];\n"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Store Heartbeat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null
+}

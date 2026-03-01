@@ -1,0 +1,59 @@
+{
+  "name": "PDF: JPL CAD -> Discord",
+  "description": null,
+  "nodes": [
+    {
+      "id": "webhook1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        260,
+        300
+      ],
+      "parameters": {
+        "path": "pdf-jpl",
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      },
+      "webhookId": "pdef-jpl"
+    },
+    {
+      "id": "discord1",
+      "name": "Post to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        540,
+        300
+      ],
+      "parameters": {
+        "url": "{{DISCORD_WEBHOOK_URL}}",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {\n  \"content\": (function(){\n    const b = $json.body ?? $json;\n    const items = (b.items || []).slice(0,5);\n    const lines = items.map(i => {\n      const ld = (i.dist_ld !== null && i.dist_ld !== undefined) ? (Number(i.dist_ld).toFixed(2) + ' LD') : (i.dist_au ? (Number(i.dist_au).toFixed(6) + ' AU') : '');\n      const v = (i.v_rel_km_s !== null && i.v_rel_km_s !== undefined) ? (' @ ' + Number(i.v_rel_km_s).toFixed(1) + ' km/s') : '';\n      const cd = i.cd ? (i.cd + ' UTC') : '';\n      return `\u2022 ${i.des || 'unknown'} \u2014 ${ld}${v} \u2014 ${cd}`.trim();\n    }).join('\\n');\n    const hdr = `PDF JPL CAD: ${b.count ?? items.length} approaches \u2264${b.dist_max_au ?? '0.01'} AU (next ${b.days_ahead ?? 14}d)`;\n    const src = b.source ? (`Source: ${b.source}`) : '';\n    return [hdr, lines, src].filter(Boolean).join('\\n');\n  })()\n} }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Post to Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null
+}

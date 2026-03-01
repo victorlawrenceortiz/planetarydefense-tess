@@ -1,0 +1,123 @@
+{
+  "name": "PDF: Deadman Check (Heartbeat)",
+  "description": null,
+  "nodes": [
+    {
+      "id": "sch1",
+      "name": "Every 30m",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "code2",
+      "name": "Check Heartbeat",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// If no heartbeat in > 70 minutes, alert\nconst s = this.getWorkflowStaticData('global');\nconst last = s.lastHeartbeat ? new Date(s.lastHeartbeat) : null;\nconst now = new Date();\nconst minutes = last ? (now - last) / 60000 : 1e9;\nconst ok = minutes <= 70;\nreturn [{json:{ok, minutesSinceHeartbeat: minutes, lastHeartbeat: s.lastHeartbeat || null}}];\n"
+      }
+    },
+    {
+      "id": "if1",
+      "name": "If stale",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        760,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.ok}}",
+              "operation": "isFalse"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "http1",
+      "name": "Post to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1000,
+        240
+      ],
+      "parameters": {
+        "url": "{{DISCORD_WEBHOOK_URL}}",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"content\": \"PDF ALERT: heartbeat missing for \" + Math.round($json.minutesSinceHeartbeat) + \" min (CT 121 may be down)\" } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Every 30m": {
+      "main": [
+        [
+          {
+            "node": "Check Heartbeat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Heartbeat": {
+      "main": [
+        [
+          {
+            "node": "If stale",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If stale": {
+      "main": [
+        [
+          {
+            "node": "Post to Discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Every 30m": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": null
+}

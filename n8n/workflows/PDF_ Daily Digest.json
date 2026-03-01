@@ -1,0 +1,118 @@
+{
+  "name": "PDF: Daily Digest",
+  "description": null,
+  "nodes": [
+    {
+      "id": "sch2",
+      "name": "Daily 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "http2",
+      "name": "Fetch JPL Latest",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        520,
+        300
+      ],
+      "parameters": {
+        "url": "http://192.168.1.241:8787/jpl/latest",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "code3",
+      "name": "Format Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        300
+      ],
+      "parameters": {
+        "jsCode": "const jpl = $json;\nconst items = (jpl.items || []).slice(0,5);\nconst lines = items.map(i => `\u2022 ${i.des} \u2014 ${(i.dist_ld ?? 0).toFixed ? Number(i.dist_ld).toFixed(2) : i.dist_ld} LD \u2014 ${i.cd} UTC`).join('\\n');\nconst hdr = `PDF Daily Digest (JPL CAD) \u2014 next ${jpl.days_ahead ?? 14}d \u2264${jpl.dist_max_au ?? 0.01} AU`;\nreturn [{json:{content:[hdr, lines, `Source: ${jpl.source}`].filter(Boolean).join('\\n')}}];\n"
+      }
+    },
+    {
+      "id": "http3",
+      "name": "Post to Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        1000,
+        300
+      ],
+      "parameters": {
+        "url": "{{DISCORD_WEBHOOK_URL}}",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"content\": $json.content } }}"
+      }
+    }
+  ],
+  "connections": {
+    "Daily 09:00": {
+      "main": [
+        [
+          {
+            "node": "Fetch JPL Latest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch JPL Latest": {
+      "main": [
+        [
+          {
+            "node": "Format Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Digest": {
+      "main": [
+        [
+          {
+            "node": "Post to Discord",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "America/New_York",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:Daily 09:00": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": null
+}
