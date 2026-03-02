@@ -1,0 +1,8 @@
+Planet texture policy:
+- Use dedicated global/equirectangular maps where possible.
+
+Current sources:
+- Earth: NASA Visible Earth (Blue Marble)
+- Mercury/Venus/Mars: Wikimedia Commons (selected file is verified 2:1 equirectangular)
+
+Check each file page for credit/licensing details.

@@ -142,11 +142,27 @@ def api_neocp():
 APP.mount('/static', StaticFiles(directory=str(STATIC_DIR)), name='static')
 
 @APP.get('/api/planet_positions')
-def api_planet_positions():
-    # current heliocentric positions (AU) at now
-    t = TS.now()
+def api_planet_positions(t: str | None = None):
+    """Current heliocentric positions (AU).
+
+    Params:
+      t: ISO-8601 datetime string (e.g. 2026-03-02T01:23:45Z). If omitted, uses now.
+    """
+    import datetime as dt
+
+    if t:
+        try:
+            # Accept trailing Z
+            ts = t.replace('Z', '+00:00')
+            d = dt.datetime.fromisoformat(ts)
+            tt = TS.from_datetime(d)
+        except Exception:
+            tt = TS.now()
+    else:
+        tt = TS.now()
+
     pos = {}
     for name, body in PLANETS.items():
-        p = (body.at(t) - SUN.at(t)).position.au
+        p = (body.at(tt) - SUN.at(tt)).position.au
         pos[name] = [float(p[0]), float(p[1]), float(p[2])]
-    return {'units': 'AU', 'positions': pos, 't': str(t.utc_iso())}
+    return {'units': 'AU', 'positions': pos, 't': str(tt.utc_iso())}
