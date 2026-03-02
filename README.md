@@ -6,6 +6,11 @@ Homelab-based planetary defense tooling (PDF) built by TESS:
 - Lightweight API
 - Live 3D orbit visualization (inner planets + confirmed objects)
 
+## Streams
+
+This project is organized as three separate streams (JPL CAD, MPC NEOCP, Sentry).
+See: `docs/Streams.md`
+
 ## Components
 
 ### CT 121 (pd-tess-sol)
