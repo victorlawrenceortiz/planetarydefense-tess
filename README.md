@@ -53,3 +53,7 @@ Then open:
 - The viz uses Skyfield DE421 ephemeris for planet orbits.
 - Confirmed object orbital elements are fetched from JPL SBDB.
 - NEOCP candidates are shown separately because their orbits are typically provisional.
+
+
+## Hosting (Local, IP-only)
+See: `docs/Hosting-Local-IP-Only.md`
