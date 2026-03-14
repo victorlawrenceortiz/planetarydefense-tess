@@ -1,0 +1,7 @@
+[Unit]
+Description=PDF SRE monitor snapshot
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/sre-monitor/sre_monitor.py

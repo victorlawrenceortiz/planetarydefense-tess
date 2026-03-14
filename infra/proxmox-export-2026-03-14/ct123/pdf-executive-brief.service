@@ -1,0 +1,7 @@
+[Unit]
+Description=PDF Executive Brief Generator
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/next3/executive_brief.py

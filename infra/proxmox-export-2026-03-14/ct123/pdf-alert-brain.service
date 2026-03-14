@@ -1,0 +1,10 @@
+[Unit]
+Description=PDF Alert Brain Runner
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/pdf-alert-brain.env
+ExecStart=/opt/pdf/alert-brain/.venv/bin/python /opt/pdf/alert-brain/alert_brain.py
+User=root

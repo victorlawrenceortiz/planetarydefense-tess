@@ -1,0 +1,5 @@
+[Unit]
+Description=PDF KPI Board Build
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/expansion/kpi_board.py

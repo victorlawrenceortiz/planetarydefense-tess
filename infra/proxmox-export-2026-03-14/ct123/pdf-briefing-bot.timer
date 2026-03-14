@@ -1,0 +1,8 @@
+[Unit]
+Description=Run PDF AI Briefing every hour
+[Timer]
+OnBootSec=6min
+OnUnitActiveSec=1h
+Persistent=true
+[Install]
+WantedBy=timers.target

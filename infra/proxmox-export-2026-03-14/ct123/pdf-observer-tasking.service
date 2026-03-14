@@ -1,0 +1,12 @@
+[Unit]
+Description=PDF Observer Tasking API
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+WorkingDirectory=/opt/pdf/next3
+ExecStart=/opt/pdf/alert-brain/.venv/bin/uvicorn observer_tasking:app --host 0.0.0.0 --port 9900
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target

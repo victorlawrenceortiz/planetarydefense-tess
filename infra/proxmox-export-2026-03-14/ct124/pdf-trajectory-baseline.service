@@ -1,0 +1,9 @@
+[Unit]
+Description=PDF Trajectory Baseline Job
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/trajectory/.venv/bin/python /opt/pdf/trajectory/trajectory_baseline.py
+User=root

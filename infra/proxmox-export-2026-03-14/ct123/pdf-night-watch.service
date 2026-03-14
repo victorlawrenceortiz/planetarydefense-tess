@@ -1,0 +1,8 @@
+[Unit]
+Description=PDF Night Watch urgent escalation
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+Environment=WEBHOOK_URL=REDACTED_WEBHOOK_URL
+ExecStart=/opt/pdf/next3/night_watch.py

@@ -1,0 +1,8 @@
+[Unit]
+Description=PDF Monthly Token Rotation
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/expansion/rotate_tokens.sh

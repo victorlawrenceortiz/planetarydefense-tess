@@ -1,0 +1,14 @@
+[Unit]
+Description=PDF NEO Feed Collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=OUT_DIR=/var/lib/pdf-neo-watchtower
+Environment=LOOKAHEAD_DAYS=1
+ExecStart=/usr/bin/python3 /opt/pdf/neo-watchtower/collector.py
+User=root
+
+[Install]
+WantedBy=multi-user.target

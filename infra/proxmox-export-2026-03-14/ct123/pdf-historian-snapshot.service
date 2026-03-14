@@ -1,0 +1,8 @@
+[Unit]
+Description=PDF Historian Snapshot Writer
+After=pdf-mission-control.service
+Wants=pdf-mission-control.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/mission-control/historian_snapshot.py

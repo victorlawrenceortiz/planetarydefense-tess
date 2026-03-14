@@ -1,0 +1,8 @@
+[Unit]
+Description=Run PDF Policy Router every 15 min
+[Timer]
+OnBootSec=7min
+OnUnitActiveSec=15min
+Persistent=true
+[Install]
+WantedBy=timers.target

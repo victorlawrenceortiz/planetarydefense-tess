@@ -1,0 +1,7 @@
+[Unit]
+Description=PDF Incident Generator
+After=pdf-alert-brain.service
+Wants=pdf-alert-brain.service
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/mission-control/incident_generator.py

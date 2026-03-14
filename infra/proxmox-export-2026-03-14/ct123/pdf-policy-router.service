@@ -1,0 +1,9 @@
+[Unit]
+Description=PDF Notification Policy Router
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+Environment=WEBHOOK_CRITICAL=REDACTED_WEBHOOK_URL
+Environment=WEBHOOK_WATCH=REDACTED_WEBHOOK_URL
+ExecStart=/opt/pdf/expansion/policy_router.py

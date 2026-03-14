@@ -1,0 +1,14 @@
+[Unit]
+Description=Serve PDF NEO feed JSON over HTTP
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/lib/pdf-neo-watchtower
+ExecStart=/usr/bin/python3 -m http.server 9080 --bind 0.0.0.0
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

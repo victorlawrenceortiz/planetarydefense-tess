@@ -1,0 +1,13 @@
+[Unit]
+Description=PDF Public API Gateway
+After=network-online.target
+Wants=network-online.target
+[Service]
+EnvironmentFile=/etc/pdf-secrets.env
+Type=simple
+WorkingDirectory=/opt/pdf/expansion
+ExecStart=/opt/pdf/alert-brain/.venv/bin/uvicorn public_api:app --host 0.0.0.0 --port 9600
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target

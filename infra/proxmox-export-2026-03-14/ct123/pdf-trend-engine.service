@@ -1,0 +1,7 @@
+[Unit]
+Description=PDF Trend Engine
+After=pdf-historian-snapshot.service
+Wants=pdf-historian-snapshot.service
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/mission-control/trend_engine.py

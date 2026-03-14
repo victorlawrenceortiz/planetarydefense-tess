@@ -1,0 +1,12 @@
+[Unit]
+Description=Serve PDF Case Management UI
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+WorkingDirectory=/var/lib/pdf-case-ui
+ExecStart=/usr/bin/python3 -m http.server 9500 --bind 0.0.0.0
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target

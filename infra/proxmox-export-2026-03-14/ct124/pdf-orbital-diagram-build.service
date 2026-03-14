@@ -1,0 +1,7 @@
+[Unit]
+Description=Build PDF live orbital diagram
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/orbital-diagram/build_orbital_diagram.py

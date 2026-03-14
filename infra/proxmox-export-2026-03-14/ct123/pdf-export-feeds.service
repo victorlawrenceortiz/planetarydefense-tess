@@ -1,0 +1,5 @@
+[Unit]
+Description=PDF Partner Export Feeds
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/expansion/export_feeds.py

@@ -1,0 +1,7 @@
+[Unit]
+Description=Build PDF advanced orbital visualization
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/opt/pdf/orbital-diagram/advanced_orbit.py

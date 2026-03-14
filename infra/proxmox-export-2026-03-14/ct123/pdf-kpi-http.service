@@ -1,0 +1,12 @@
+[Unit]
+Description=Serve PDF KPI Board
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+WorkingDirectory=/var/lib/pdf-kpi
+ExecStart=/usr/bin/python3 -m http.server 9800 --bind 0.0.0.0
+Restart=always
+RestartSec=2
+[Install]
+WantedBy=multi-user.target
